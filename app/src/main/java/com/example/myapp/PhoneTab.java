@@ -39,6 +39,7 @@ public class PhoneTab extends FragmentTab{
     PhoneRecycleAdapter phoneAdapter = new PhoneRecycleAdapter();
     RecyclerView recycleview;
     HttpRequestHelper helper = new HttpRequestHelper();
+    public final int PHONE_ADD_REQUEST = 99;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,8 +64,12 @@ public class PhoneTab extends FragmentTab{
                 public void onClick(View view) {
                     Intent intent = new Intent(getContext(), PhoneAddActivity.class);
 
-                    getActivity().startActivity(intent);
+                    getActivity().startActivityForResult(intent, PHONE_ADD_REQUEST);
 
+//                    Intent intent = new Intent(ContactsContract.Intents.Insert.ACTION);
+//                    intent.setType(ContactsContract.RawContacts.CONTENT_TYPE);
+
+//                    getActivity().startActivity(intent);
                 }
             });
 
@@ -79,14 +84,21 @@ public class PhoneTab extends FragmentTab{
         return view;
     }
 
-    public class LoadContactFromDb extends AsyncTask<Void, Void, String> {
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        phoneAdapter.notifyDataSetChanged();
+    }
+
+    public class LoadContactFromDb extends AsyncTask<Void, Void, ArrayList<Contact>> {
         @Override
-        protected String doInBackground(Void... voids) {
+        protected ArrayList<Contact> doInBackground(Void... voids) {
             String result = helper.GETAll();
-            Log.d("myApp", result);
+            ArrayList<Contact> phoneArrayList = new ArrayList<Contact>();
 
             try {
-                ArrayList<Contact> phoneArrayList = new ArrayList<Contact>();
+
 
                 JSONArray array = new JSONArray(result);
                 for (int index = 0; index < array.length(); ++index) {
@@ -98,7 +110,7 @@ public class PhoneTab extends FragmentTab{
 
                 }
 
-                phoneAdapter.setList(phoneArrayList);
+//                phoneAdapter.setList(phoneArrayList);
 
 
             } catch (JSONException e) {
@@ -107,7 +119,14 @@ public class PhoneTab extends FragmentTab{
                 Log.d("myApp", e.toString());
             }
 
-            return result;
+            return phoneArrayList;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Contact> contacts) {
+            super.onPostExecute(contacts);
+
+            phoneAdapter.setList(contacts);
         }
     }
 }

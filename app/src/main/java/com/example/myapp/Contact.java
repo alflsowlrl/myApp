@@ -1,14 +1,17 @@
 package com.example.myapp;
 
+import android.telephony.PhoneNumberUtils;
+
+import androidx.annotation.NonNull;
+
 class Contact {
     private String Name;
     private String PhoneNumber;
-    private String id;
 
     public Contact(String _Name, String _PhoneNumber)
     {
         this.Name = _Name;
-        this.PhoneNumber = _PhoneNumber;
+        this.PhoneNumber = _PhoneNumber.replaceAll("-", "");
     }
 
     public String getName() {
@@ -16,8 +19,15 @@ class Contact {
     }
 
     public String getNumber() {
-        return PhoneNumber;
+        return PhoneNumberUtils.formatNumber(PhoneNumber);
     }
 
-//    public String getId() { return id;}
+    @NonNull
+    @Override
+    public String toString() {
+        super.toString();
+        return "name: " + Name + " phone: " + PhoneNumber;
+    }
+
+    //    public String getId() { return id;}
 }

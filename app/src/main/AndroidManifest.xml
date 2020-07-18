@@ -23,6 +23,9 @@
         </activity>
         <activity android:name=".FullScreenImageActivity" />
         <activity android:name=".PhoneAddActivity" />
+        <activity
+            android:name=".PhonePopup"
+            android:theme="@android:style/Theme.Dialog" />
         <activity android:name=".VideoPlayActivity"></activity>
         <provider
             android:name="androidx.core.content.FileProvider"

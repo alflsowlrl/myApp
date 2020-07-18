@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         LoadContactsAyscn lca = new LoadContactsAyscn();
         lca.execute();
 
-        initViewPager(); // 뷰페이저와 어댑터 장착
+//        initViewPager(); // 뷰페이저와 어댑터 장착
     }
 
     private View createView(String tabName){
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
                 final String contactName =  c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 final String phNumber = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
+                final long phId = c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
 
                 HttpRequestHelper helper = new HttpRequestHelper();
                 helper.POST(new Contact(contactName, phNumber));
@@ -156,10 +156,6 @@ public class MainActivity extends AppCompatActivity {
 
             c.close();
 
-//            String string = GETAll();
-//
-//            Log.d("myApp", string);
-
 
 
             return contacts;
@@ -168,6 +164,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final ArrayList<Contact> contacts) {
             super.onPostExecute(contacts);
+
+            initViewPager(); // 뷰페이저와 어댑터 장착
 
 //            pd.cancel();
 //            pd.dismiss();

@@ -1,6 +1,8 @@
 package com.example.myapp;
 
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,30 +29,21 @@ class PhoneRecycleAdapter extends RecyclerView.Adapter<PhoneRecycleAdapter.Phone
 
        PhoneHolder(final View itemView){
            super(itemView);
-           //this.itemView = itemView.getRootView();
-           itemView.setOnLongClickListener(new View.OnLongClickListener() {
+
+           LinearLayout nameNumberHolder = itemView.findViewById(R.id.nameNumberHolder);
+
+           nameNumberHolder.setOnLongClickListener(new View.OnLongClickListener() {
                @Override
                public boolean onLongClick(View view) {
-                   listData.remove(getAdapterPosition());
                    String name = listData.get(getAdapterPosition()).getName();
-//                   final String id = listData.get(getAdapterPosition()).getId();
-                   Toast.makeText(itemView.getContext(), name + "님이 삭제 되었습니다", Toast.LENGTH_SHORT).show();
-                   notifyItemRemoved(getAdapterPosition());
-                   //동시에 여러개 누르면 안됨
+                   String number = listData.get(getAdapterPosition()).getNumber();
 
-                   //db에서 삭제
-//                   class DeleteContact extends AsyncTask<Void, Void, String> {
-//                       @Override
-//                       protected String doInBackground(Void... voids) {
-//                           HttpRequestHelper helper = new HttpRequestHelper();
-//                           helper.DELETE(new Contact("", "", id));
-//
-//                           return "";
-//                       }
-//                   }
-//
-//                   DeleteContact lcfd = new DeleteContact();
-//                   lcfd.execute();
+                   //동시에 여러개 누르면 안됨
+                   Intent intent = new Intent(itemView.getContext(), PhonePopup.class);
+                   intent.putExtra("name", name);
+                   intent.putExtra("number", number);
+
+                   itemView.getContext().startActivity(intent);
 
                    return true;
                }

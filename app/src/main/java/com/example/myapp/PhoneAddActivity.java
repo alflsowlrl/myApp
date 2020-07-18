@@ -3,6 +3,7 @@ package com.example.myapp;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -57,11 +59,20 @@ public class PhoneAddActivity extends Activity {
                 contentValues.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, editTextPersonName.getText().toString());
                 dataUri = getContentResolver().insert(ContactsContract.Data.CONTENT_URI, contentValues);
 
+
+                final String name = editTextPersonName.getText().toString().trim();
+                final String number = editTextPhone.getText().toString().trim();
+
+                if(name.length() == 0 || number.length() ==0){
+                    Toast.makeText(view.getContext(), "이름과 번호를 모두 입력해야 합니다", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                  class PostContact extends AsyncTask<Void, Void, String> {
                     @Override
                     protected String doInBackground(Void... voids) {
                         HttpRequestHelper helper = new HttpRequestHelper();
-                        helper.POST(new Contact(editTextPersonName.getText().toString(), editTextPhone.getText().toString()));
+                        helper.POST(new Contact(name, number));
 
 
                         return "";
