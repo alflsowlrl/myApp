@@ -3,6 +3,7 @@ package com.example.myapp;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity{
         actionBar.setTitle("App Name");
 
         Intent intent =  getIntent();
-        Long id = intent.getLongExtra("id", -1);
+        final Long id = intent.getLongExtra("id", -1);
 
         if(id == -1){
             UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
@@ -57,6 +58,23 @@ public class MainActivity extends AppCompatActivity{
                 }
             });
         }
+        else{
+
+            class Register extends AsyncTask<Void, Void, Void>{
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    HttpRequestHelper helper = new HttpRequestHelper();
+                    helper.REGISTER_USER(id);
+                    return null;
+                }
+            }
+
+            Register register = new Register();
+            register.execute();
+
+        }
+
+
 
         PreferenceManager.setString(this, "user_id", String.valueOf(id));
         initViewPager(); // 뷰페이저와 어댑터 장착

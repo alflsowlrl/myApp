@@ -13,17 +13,20 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class HttpRequestHelper {
     private final String TAG = "HTTP_HELPER";
 
-    public String REQUEST(String Method, String uri, String json){
+    private String REQUEST(String Method, String uri, String json){
         InputStream is = null;
         String result = "";
 
         try {
             URL urlCon = new URL(uri);
             HttpURLConnection httpCon = (HttpURLConnection)urlCon.openConnection();
+
+            Log.d("myApp", "url: " + uri + " method: " + Method + "json: " + json);
 
             // Set some headers to inform server about the type of the content
 
@@ -41,6 +44,7 @@ public class HttpRequestHelper {
 
 
             if(Method.equals("POST") || Method.equals("DELETE")){
+                httpCon.setDoOutput(true);
                 OutputStream os = httpCon.getOutputStream();
 
                 os.write(json.getBytes("UTF-8"));
@@ -82,7 +86,7 @@ public class HttpRequestHelper {
         return result;
     }
 
-    public void POST_CONTACTS(ArrayList<Contact> contactArrayList, Long id){
+    public void POST_CONTACTS(List<Contact> contactArrayList, Long id){
         String json = "";
 
         try {
@@ -92,13 +96,15 @@ public class HttpRequestHelper {
 
                 JSONObject contactJsonObject = new JSONObject();
 
+                contactJsonObject.accumulate("user_id", String.valueOf(id));
+
                 contactJsonObject.accumulate("name", contact.getName());
 
                 contactJsonObject.accumulate("number", contact.getNumber());
 
                 json = contactJsonObject.toString();
 
-                REQUEST("POST", "http://192.249.19.244:1880/api/phoneBook/" + id, json);
+                REQUEST("POST", "http://192.249.19.244:1880/api/phoneBook", json);
             }
         }
         catch (Exception e){e.printStackTrace();}
@@ -113,10 +119,12 @@ public class HttpRequestHelper {
 
             JSONObject jsonObject = new JSONObject();
 
-            jsonObject.accumulate("user_id", id);
+            jsonObject.accumulate("user_id", String.valueOf(id));
 
 
             json = jsonObject.toString();
+
+            Log.d("myApp", "id: " + json);
         }
         catch (Exception e){e.printStackTrace();}
 
@@ -133,6 +141,8 @@ public class HttpRequestHelper {
 
             JSONObject jsonObject = new JSONObject();
 
+            jsonObject.accumulate("user_id", id);
+
             jsonObject.accumulate("name", contact.getName());
 
             jsonObject.accumulate("number", contact.getNumber());
@@ -144,7 +154,7 @@ public class HttpRequestHelper {
 
         Log.d(TAG, "delete: " + json);
 
-        return REQUEST("DELETE", "http://192.249.19.244:1880/api/phoneBook/"+id, json);
+        return REQUEST("DELETE", "http://192.249.19.244:1880/api/phoneBook", json);
     }
 
     public String GETAll(Long id){

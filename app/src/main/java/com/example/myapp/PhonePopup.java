@@ -45,7 +45,7 @@ public class PhonePopup extends Activity {
 
         contact = new Contact(name, number, false);
 
-        Button phoneMod = findViewById(R.id.phoneMod);
+        Button phoneMod = findViewById(R.id.phoneCancel);
         Button phoneDel = findViewById(R.id.phoneDel);
 
         phoneMod.setOnClickListener(new View.OnClickListener() {
@@ -72,26 +72,23 @@ public class PhonePopup extends Activity {
         });
     }
 
-    //확인 버튼 클릭
-//    public void mOnMod(View v) {
-//        //데이터 전달하기
-//        if(contact != null){
-//            editPhone(contact);
-//        }
+    //취소 버튼 클릭
+    public void mOnCancel(View v) {
+        //데이터 전달하기
+
+        //액티비티(팝업) 닫기
+        finish();
+    }
 //
-//        //액티비티(팝업) 닫기
-//        finish();
-//    }
-//
-//    public void mOnDel(View v) {
-//        if(contact != null){
-//            removePhone(contact);
-//        }
-//
-//        Toast.makeText(v.getContext(), contact.getName() + "님이 삭제 되었습니다", Toast.LENGTH_SHORT).show();
-//        //액티비티(팝업) 닫기
-//        finish();
-//    }
+    public void mOnDel(View v) {
+        if(contact != null){
+            removePhone(contact);
+        }
+
+        Toast.makeText(v.getContext(), contact.getName() + "님이 삭제 되었습니다", Toast.LENGTH_SHORT).show();
+        //액티비티(팝업) 닫기
+        finish();
+    }
 
 
     @Override
@@ -112,69 +109,83 @@ public class PhonePopup extends Activity {
     }
 
     private void removePhone(final Contact contact) {
-        String[] projection = {
-                ContactsContract.CommonDataKinds.Phone._ID,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
-        };
-
-
-        String displayName;
-        Uri contentUri = null;
-//        Cursor cursor= getContentResolver().query(
-//            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-//            projection,
-//            null,
-//            null,
-//            null
-//        );
-
-
-        Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null, null, null);
-
-
-
-        while (cursor.moveToNext()) {
-
-//            int idColumn = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone._ID);
-//            int displayNameColumn = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
-//            long id = cursor.getLong(idColumn);
-//            displayName = cursor.getString(displayNameColumn);
-//            if (displayName != contact.getName()) {
-//                continue;
-//            }
-//            contentUri = Uri.withAppendedPath(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, Long.toString(id));
-
-            final String contactName =  cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            final String phNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            final long id = cursor.getLong(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone._ID));
-
-            if(contactName.equals(contact.getName())  && phNumber.equals(contact.getNumber().replaceAll("-", ""))){
-
-                //핸드폰 연락처에서 삭제하기
-                contentUri = Uri.withAppendedPath(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, Long.toString(id));
-                getContentResolver().delete(contentUri, null, null);
-
-                //DB에서 삭제하기
-                final HttpRequestHelper helper = new HttpRequestHelper();
-
-                class DeleteAsync extends AsyncTask<Void, Void, Void>{
-                    @Override
-                    protected Void doInBackground(Void... params) {
-
-                        helper.DELETE(contact, id);
-                        return null;
-                    }
-                }
-
-                DeleteAsync asn = new DeleteAsync();
-                asn.execute();
+        class RemoveContact extends AsyncTask<Void, Void, Void>{
+            @Override
+            protected Void doInBackground(Void... voids) {
+                HttpRequestHelper helper = new HttpRequestHelper();
+                helper.DELETE(contact, Long.valueOf(PreferenceManager.getString(getApplicationContext(),"user_id")));
+                return null;
             }
         }
 
-        Log.d("myApp", "uri: " + contentUri);
-
-//        getContentResolver().delete(contentUri, null, null);
+        RemoveContact removeContact = new RemoveContact();
+        removeContact.execute();
     }
+
+//    private void removePhone(final Contact contact) {
+//        String[] projection = {
+//                ContactsContract.CommonDataKinds.Phone._ID,
+//                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
+//        };
+//
+//
+//        String displayName;
+//        Uri contentUri = null;
+////        Cursor cursor= getContentResolver().query(
+////            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+////            projection,
+////            null,
+////            null,
+////            null
+////        );
+//
+//
+//        Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null, null, null);
+//
+//
+//
+//        while (cursor.moveToNext()) {
+//
+////            int idColumn = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone._ID);
+////            int displayNameColumn = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+////            long id = cursor.getLong(idColumn);
+////            displayName = cursor.getString(displayNameColumn);
+////            if (displayName != contact.getName()) {
+////                continue;
+////            }
+////            contentUri = Uri.withAppendedPath(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, Long.toString(id));
+//
+//            final String contactName =  cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+//            final String phNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+//            final long id = cursor.getLong(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone._ID));
+//
+//            if(contactName.equals(contact.getName())  && phNumber.equals(contact.getNumber().replaceAll("-", ""))){
+//
+//                //핸드폰 연락처에서 삭제하기
+//                contentUri = Uri.withAppendedPath(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, Long.toString(id));
+//                getContentResolver().delete(contentUri, null, null);
+//
+//                //DB에서 삭제하기
+//                final HttpRequestHelper helper = new HttpRequestHelper();
+//
+//                class DeleteAsync extends AsyncTask<Void, Void, Void>{
+//                    @Override
+//                    protected Void doInBackground(Void... params) {
+//
+//                        helper.DELETE(contact, id);
+//                        return null;
+//                    }
+//                }
+//
+//                DeleteAsync asn = new DeleteAsync();
+//                asn.execute();
+//            }
+//        }
+//
+//        Log.d("myApp", "uri: " + contentUri);
+//
+////        getContentResolver().delete(contentUri, null, null);
+//    }
 
     private void editPhone(Contact contact) {
          String[] projection = {

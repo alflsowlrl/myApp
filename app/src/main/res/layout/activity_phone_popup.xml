@@ -55,14 +55,14 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/phoneMod"
+            android:id="@+id/phoneCancel"
             android:layout_width="wrap_content"
             android:layout_height="53dp"
             android:layout_weight="1"
             android:background="#00000000"
             android:gravity="center"
             android:padding="16dp"
-            android:text="수정"
+            android:text="취소"
             android:textColor="#ff7a00"
             android:textSize="15sp" />
 

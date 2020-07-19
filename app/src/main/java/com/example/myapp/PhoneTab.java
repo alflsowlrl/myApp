@@ -90,6 +90,9 @@ public class PhoneTab extends FragmentTab{
     @Override
     public void onResume() {
         super.onResume();
+        LoadContactFromDb lcfd = new LoadContactFromDb();
+        lcfd.execute();
+
 
         phoneAdapter.notifyDataSetChanged();
     }

@@ -1,5 +1,6 @@
 package com.example.myapp;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -19,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kakao.usermgmt.StringSet.user_id;
 
 public class CardViewActivity extends AppCompatActivity {
 
@@ -77,17 +80,25 @@ public class CardViewActivity extends AppCompatActivity {
         // set the adapter object to the Recyclerview
         mRecyclerView.setAdapter(mAdapter);
 
+        final Context context = getApplicationContext();
+
+        final ArrayList<Contact> selected = new ArrayList<Contact>();
+
         btnSelection.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 String data = "";
-                List<Contact> stList = ((CardViewDataAdapter) mAdapter)
+                final List<Contact> stList = ((CardViewDataAdapter) mAdapter)
                         .getStudentist();
 
                 for (int i = 0; i < stList.size(); i++) {
                     Contact singleStudent = stList.get(i);
+
+
                     if (singleStudent.isSelected() == true) {
+
+                        selected.add(singleStudent);
 
                         data = data + "\n" + singleStudent.getName().toString() + ", " + singleStudent.getNumber().toString();
 
@@ -98,16 +109,26 @@ public class CardViewActivity extends AppCompatActivity {
                          * singleStudent.isSelected(),
                          * Toast.LENGTH_SHORT).show();
                          */
+
+                        Toast.makeText(getApplicationContext(), "저장 완료", Toast.LENGTH_SHORT).show();
                     }
 
                 }
 
-                Toast.makeText(CardViewActivity.this,
-                        "Selected Students: \n" + data , Toast.LENGTH_SHORT)
-                        .show();
+                class PostContacts extends AsyncTask<Void, Void, Void>{
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        HttpRequestHelper helper = new HttpRequestHelper();
+                        helper.POST_CONTACTS(selected, Long.valueOf(PreferenceManager.getString(context,"user_id")));
+                        return null;
+                    }
+                }
+
+                PostContacts postContacts = new PostContacts();
+                postContacts.execute();
+
             }
         });
-
     }
 
     //주소록 함수
