@@ -2,6 +2,7 @@ package com.example.myapp;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -11,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class HttpRequestHelper {
     private final String TAG = "HTTP_HELPER";
@@ -80,34 +82,51 @@ public class HttpRequestHelper {
         return result;
     }
 
-    public String POST(Contact contact){
+    public void POST_CONTACTS(ArrayList<Contact> contactArrayList, Long id){
         String json = "";
 
         try {
-            URL urlCon = new URL("http://192.249.19.244:1880/api/contacts");
+            // build jsonObject
 
+            for(Contact contact: contactArrayList){
 
+                JSONObject contactJsonObject = new JSONObject();
+
+                contactJsonObject.accumulate("name", contact.getName());
+
+                contactJsonObject.accumulate("number", contact.getNumber());
+
+                json = contactJsonObject.toString();
+
+                REQUEST("POST", "http://192.249.19.244:1880/api/phoneBook/" + id, json);
+            }
+        }
+        catch (Exception e){e.printStackTrace();}
+    }
+
+    public String REGISTER_USER(Long id){
+        String json = "";
+        String url = "http://192.249.19.244:1880/api/user";
+
+        try {
             // build jsonObject
 
             JSONObject jsonObject = new JSONObject();
 
-            jsonObject.accumulate("name", contact.getName());
-
-            jsonObject.accumulate("number", contact.getNumber());
+            jsonObject.accumulate("user_id", id);
 
 
             json = jsonObject.toString();
         }
         catch (Exception e){e.printStackTrace();}
 
-        return REQUEST("POST", "http://192.249.19.244:1880/api/contacts", json);
+        return REQUEST("POST", url, json);
     }
 
-    public String DELETE(Contact contact){
+    public String DELETE(Contact contact, Long id){
         String json = "";
 
         try {
-            URL urlCon = new URL("http://192.249.19.244:1880/api/contacts");
 
 
             // build jsonObject
@@ -125,11 +144,11 @@ public class HttpRequestHelper {
 
         Log.d(TAG, "delete: " + json);
 
-        return REQUEST("DELETE", "http://192.249.19.244:1880/api/contacts", json);
+        return REQUEST("DELETE", "http://192.249.19.244:1880/api/phoneBook/"+id, json);
     }
 
-    public String GETAll(){
-        return REQUEST("GET", "http://192.249.19.244:1880/api/contacts", "");
+    public String GETAll(Long id){
+        return REQUEST("GET", "http://192.249.19.244:1880/api/phoneBook/"+id, "");
     }
 
     public String convertStreamToString(InputStream is) throws Exception {

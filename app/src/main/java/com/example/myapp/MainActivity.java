@@ -1,42 +1,34 @@
 package com.example.myapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.ViewPager;
-
 import android.Manifest;
-import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.loader.app.LoaderManager;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+public class MainActivity extends AppCompatActivity{
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
 
     //Gallery
     private final static int READ_EXTERNAL_STORAGE_PERMMISSION_RESULT = 0;
@@ -49,11 +41,52 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LoadContactsAyscn lca = new LoadContactsAyscn();
-        lca.execute();
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("App Name");
 
-//        initViewPager(); // 뷰페이저와 어댑터 장착
+        Intent intent =  getIntent();
+        Long id = intent.getLongExtra("id", -1);
+
+        if(id == -1){
+            UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
+                @Override
+                public void onCompleteLogout() {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            });
+        }
+
+        PreferenceManager.setString(this, "user_id", String.valueOf(id));
+        initViewPager(); // 뷰페이저와 어댑터 장착
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.logout_btn:
+                //툴바의 아이콘이 할 기능 정의할 것
+                UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
+                    @Override
+                    public void onCompleteLogout() {
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    }
+                });
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
     private View createView(String tabName){
         View tabView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.custom_tab_button, null);
@@ -124,58 +157,57 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    class LoadContactsAyscn extends AsyncTask<Void, Void, ArrayList<Contact>> {
-        ProgressDialog pd;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-//            pd = ProgressDialog.show(MainActivity.this, "Loading Contacts","Please Wait");
-        }
-
-        @Override
-        protected ArrayList<Contact> doInBackground(Void... params) {
-            ArrayList<Contact> contacts = new ArrayList<Contact>();
-            Contact temp;
-
-            Cursor c = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null, null, "upper("+ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + ") ASC");
-
-            while (c.moveToNext()) {
-
-                final String contactName =  c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                final String phNumber = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                final long phId = c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
-
-                HttpRequestHelper helper = new HttpRequestHelper();
-                helper.POST(new Contact(contactName, phNumber));
-
-                temp = new Contact(contactName, phNumber);
-                contacts.add(temp);
-            }
-
-            c.close();
-
-
-
-            return contacts;
-        }
-
-        @Override
-        protected void onPostExecute(final ArrayList<Contact> contacts) {
-            super.onPostExecute(contacts);
-
-            initViewPager(); // 뷰페이저와 어댑터 장착
-
-//            pd.cancel();
-//            pd.dismiss();
-
-
-//            ContactsAdapter adapter = new ContactsAdapter(getApplicationContext(), R.layout.text, contacts);
+//    class LoadContactsAyscn extends AsyncTask<Void, Void, ArrayList<Contact>> {
+//        ProgressDialog pd;
 //
-//            list.setAdapter(adapter);
-        }
-    }
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//
+////            pd = ProgressDialog.show(MainActivity.this, "Loading Contacts","Please Wait");
+//        }
+//
+//        @Override
+//        protected ArrayList<Contact> doInBackground(Void... params) {
+//            ArrayList<Contact> contacts = new ArrayList<Contact>();
+//            Contact temp;
+//
+//            Cursor c = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null, null, "upper("+ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + ") ASC");
+//
+//            while (c.moveToNext()) {
+//
+//                final String contactName =  c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+//                final String phNumber = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+//                final long phId = c.getLong(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
+//
+//                HttpRequestHelper helper = new HttpRequestHelper();
+//
+//                temp = new Contact(contactName, phNumber, false);
+//                contacts.add(temp);
+//            }
+//
+//            c.close();
+//
+//
+//
+//            return contacts;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(final ArrayList<Contact> contacts) {
+//            super.onPostExecute(contacts);
+//
+//            initViewPager(); // 뷰페이저와 어댑터 장착
+//
+////            pd.cancel();
+////            pd.dismiss();
+//
+//
+////            ContactsAdapter adapter = new ContactsAdapter(getApplicationContext(), R.layout.text, contacts);
+////
+////            list.setAdapter(adapter);
+//        }
+//    }
 
     //갤러리 함수
     @Override

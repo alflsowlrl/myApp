@@ -62,7 +62,10 @@ public class PhoneTab extends FragmentTab{
             floatingButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(getContext(), PhoneAddActivity.class);
+
+
+
+                    Intent intent = new Intent(getContext(), CardViewActivity.class);
 
                     getActivity().startActivityForResult(intent, PHONE_ADD_REQUEST);
 
@@ -94,7 +97,10 @@ public class PhoneTab extends FragmentTab{
     public class LoadContactFromDb extends AsyncTask<Void, Void, ArrayList<Contact>> {
         @Override
         protected ArrayList<Contact> doInBackground(Void... voids) {
-            String result = helper.GETAll();
+
+            String user_id = PreferenceManager.getString(getContext(), "user_id");
+
+            String result = helper.GETAll(Long.valueOf(user_id));
             ArrayList<Contact> phoneArrayList = new ArrayList<Contact>();
 
             try {
@@ -106,7 +112,7 @@ public class PhoneTab extends FragmentTab{
                     String name = offerObject.getString("name");
                     String number = offerObject.getString("number");
 //                    String id = offerObject.getString("_id");
-                    phoneArrayList.add(new Contact(name, number));
+                    phoneArrayList.add(new Contact(name, number,false));
 
                 }
 

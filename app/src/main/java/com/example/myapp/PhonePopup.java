@@ -43,7 +43,7 @@ public class PhonePopup extends Activity {
         String number = intent.getStringExtra("number");
         txtText.setText(name + ": " + number);
 
-        contact = new Contact(name, number);
+        contact = new Contact(name, number, false);
 
         Button phoneMod = findViewById(R.id.phoneMod);
         Button phoneDel = findViewById(R.id.phoneDel);
@@ -161,7 +161,7 @@ public class PhonePopup extends Activity {
                     @Override
                     protected Void doInBackground(Void... params) {
 
-                        helper.DELETE(contact);
+                        helper.DELETE(contact, id);
                         return null;
                     }
                 }
