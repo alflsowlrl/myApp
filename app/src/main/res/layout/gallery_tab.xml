@@ -11,4 +11,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="132dp"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/kakaotalk_icon" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/downloadImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="132dp"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/kakaoaccount_icon" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
