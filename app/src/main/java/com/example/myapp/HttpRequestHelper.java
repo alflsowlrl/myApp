@@ -110,6 +110,27 @@ public class HttpRequestHelper {
         catch (Exception e){e.printStackTrace();}
     }
 
+    public void ADD_FILE_NAME(String group_name, String file_name){
+        String json = "";
+
+        try {
+            // build jsonObject
+
+            JSONObject contactJsonObject = new JSONObject();
+
+            contactJsonObject.accumulate("group_name", group_name);
+
+            contactJsonObject.accumulate("file_name", file_name);
+
+
+            json = contactJsonObject.toString();
+
+            REQUEST("POST", "http://192.249.19.244:1880/api/nameBook", json);
+
+        }
+        catch (Exception e){e.printStackTrace();}
+    }
+
     public String REGISTER_USER(Long id){
         String json = "";
         String url = "http://192.249.19.244:1880/api/user";

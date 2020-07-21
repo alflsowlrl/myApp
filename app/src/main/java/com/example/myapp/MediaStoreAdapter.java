@@ -17,12 +17,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class MediaStoreAdapter extends RecyclerView.Adapter<MediaStoreAdapter.ViewHolder> {
 
     private Cursor mMediaStoreCursor;
     private final Activity mActivity;
     private OnClickThumbListener mOnClickThumbListener;
+    ArrayList<String> file_name_list;
+    private final String server_url = "http://192.249.19.244:1880";
 
     public interface OnClickThumbListener {
         void OnClickImage(Uri imageUri);
@@ -43,10 +46,11 @@ public class MediaStoreAdapter extends RecyclerView.Adapter<MediaStoreAdapter.Vi
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Glide.with(mActivity)
-                .load(getUriFromMediaStore(position))
+                .load(server_url + "/download/" + file_name_list.get(position))
                 .centerCrop()
                 .override(96, 96)
                 .into(holder.getImageView());
+
     }
 
     @Override

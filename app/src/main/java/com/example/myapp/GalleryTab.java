@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -37,6 +38,8 @@ import com.example.myapp.FullScreenImageActivity;
 import com.example.myapp.MediaStoreAdapter;
 import com.example.myapp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,6 +59,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.view.View.GONE;
 import static java.lang.String.valueOf;
@@ -69,8 +73,10 @@ public class GalleryTab extends FragmentTab
     private MediaStoreAdapter mMediaStoreAdapter;
     private RecyclerView mThumbnailRecyclerView;
     private ConstraintLayout mConstraintLayout;
-    private final static int IMAGE_RESULT = 200;
+
     private final String server_url = "http://192.249.19.244:1880";
+
+    private final static int IMAGE_RESULT = 200;
 
 
     @Override
@@ -90,7 +96,10 @@ public class GalleryTab extends FragmentTab
         mAddImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(getPickImageChooserIntent(), IMAGE_RESULT);
+                Intent intent = new Intent(getContext(), UploadPost.class);
+                startActivity(intent);
+
+//                startActivityForResult(getPickImageChooserIntent(), IMAGE_RESULT);
             }
         });
 
@@ -102,6 +111,8 @@ public class GalleryTab extends FragmentTab
                 startActivity(intent);
             }
         });
+
+        loadDBFiles();
 
         checkReadExternalStoragePermission();
 
@@ -128,6 +139,35 @@ public class GalleryTab extends FragmentTab
             }
 
         }
+    }
+
+    private void loadDBFiles(){
+        final ArrayList<String> result = new ArrayList<String>();
+
+        final String group_name = PreferenceManager.getString(getContext(),"group_name");
+
+        Gson gson = new GsonBuilder().setLenient().create();
+        UploadService uploadService = new Retrofit.Builder().
+                baseUrl(server_url).
+                addConverterFactory(GsonConverterFactory.create(gson)).
+                build().
+                create(UploadService.class);
+
+        uploadService.getFileNames(group_name).enqueue(new Callback<FileNameBookBody>() {
+            @Override
+            public void onResponse(Call<FileNameBookBody> call, Response<FileNameBookBody> response) {
+                Log.d("gallery", "success");
+                result.addAll(response.body().file_name_list);
+            }
+
+            @Override
+            public void onFailure(Call<FileNameBookBody> call, Throwable t) {
+                Log.d("gallery", "fail");
+            }
+        });
+
+        mMediaStoreAdapter.file_name_list = result;
+
     }
 
     private void getByteArrayInBackground(final Bitmap bitmap) {
@@ -175,6 +215,7 @@ public class GalleryTab extends FragmentTab
                 FileOutputStream fos = new FileOutputStream(file);
                 fos.write(byteArray);
                 fos.flush();
+                fos.close();
                 fos.close();
 
 //                textView.setTextColor(Color.BLUE);

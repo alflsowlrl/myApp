@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity{
 
 
         PreferenceManager.setString(this, "user_id", String.valueOf(id));
+        PreferenceManager.setString(this, "group_name", "abs");
         initViewPager(); // 뷰페이저와 어댑터 장착
     }
 
