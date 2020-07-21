@@ -110,6 +110,8 @@ public class HttpRequestHelper {
         catch (Exception e){e.printStackTrace();}
     }
 
+
+
     public void ADD_FILE_NAME(String group_name, String file_name){
         String json = "";
 
@@ -125,7 +127,7 @@ public class HttpRequestHelper {
 
             json = contactJsonObject.toString();
 
-            REQUEST("POST", "http://192.249.19.244:1880/api/nameBook", json);
+            REQUEST("POST", "http://192.249.19.244:1880/api/memoBook", json);
 
         }
         catch (Exception e){e.printStackTrace();}
@@ -180,6 +182,10 @@ public class HttpRequestHelper {
 
     public String GETAll(Long id){
         return REQUEST("GET", "http://192.249.19.244:1880/api/phoneBook/"+id, "");
+    }
+
+    public String GETAllFileNames(String group_name){
+        return REQUEST("GET", "http://192.249.19.244:1880/api/memoBook/"+group_name, "");
     }
 
     public String convertStreamToString(InputStream is) throws Exception {

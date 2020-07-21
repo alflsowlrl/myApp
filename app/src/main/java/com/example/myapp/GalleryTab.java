@@ -41,6 +41,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
@@ -73,6 +77,8 @@ public class GalleryTab extends FragmentTab
     private MediaStoreAdapter mMediaStoreAdapter;
     private RecyclerView mThumbnailRecyclerView;
     private ConstraintLayout mConstraintLayout;
+
+    private HttpRequestHelper http_helper = new HttpRequestHelper();
 
     private final String server_url = "http://192.249.19.244:1880";
 
@@ -146,27 +152,37 @@ public class GalleryTab extends FragmentTab
 
         final String group_name = PreferenceManager.getString(getContext(),"group_name");
 
-        Gson gson = new GsonBuilder().setLenient().create();
-        UploadService uploadService = new Retrofit.Builder().
-                baseUrl(server_url).
-                addConverterFactory(GsonConverterFactory.create(gson)).
-                build().
-                create(UploadService.class);
-
-        uploadService.getFileNames(group_name).enqueue(new Callback<FileNameBookBody>() {
+        class LoadFileNames extends AsyncTask<Void, Void, Void>{
             @Override
-            public void onResponse(Call<FileNameBookBody> call, Response<FileNameBookBody> response) {
-                Log.d("gallery", "success");
-                result.addAll(response.body().file_name_list);
-            }
+            protected Void doInBackground(Void... voids) {
+                String result = http_helper.GETAllFileNames(group_name);
+                ArrayList<String> fileNameList = new ArrayList<String>();
 
-            @Override
-            public void onFailure(Call<FileNameBookBody> call, Throwable t) {
-                Log.d("gallery", "fail");
-            }
-        });
+                try {
 
-        mMediaStoreAdapter.file_name_list = result;
+                    JSONArray array = new JSONArray(result);
+                    for (int index = 0; index < array.length(); ++index) {
+                        JSONObject offerObject = array.getJSONObject(index);
+                        String fileName = offerObject.getString("file_name");
+
+                        fileNameList.add(fileName);
+
+                    }
+                    mMediaStoreAdapter.file_name_list = fileNameList;
+
+                } catch (JSONException e) {
+                    Log.d("myApp", e.toString());
+                } catch (Exception e) {
+                    Log.d("myApp", e.toString());
+                }
+                return null;
+            }
+        }
+
+        LoadFileNames loadFileNames = new LoadFileNames();
+        loadFileNames.execute();
+
+
 
     }
 
@@ -394,16 +410,16 @@ public class GalleryTab extends FragmentTab
 
     @Override
     public void OnClickImage(Uri imageUri) {
-        Intent fullScreenIntent = new Intent(this.getContext(), FullScreenImageActivity.class);
-        fullScreenIntent.setData(imageUri);
-        startActivity(fullScreenIntent);
+//        Intent fullScreenIntent = new Intent(this.getContext(), FullScreenImageActivity.class);
+//        fullScreenIntent.setData(imageUri);
+//        startActivity(fullScreenIntent);
     }
 
     @Override
     public void OnClickVideo(Uri videoUri) {
-        Intent videoPlayIntent = new Intent(this.getContext(), VideoPlayActivity.class);
-        videoPlayIntent.setData(videoUri);
-        startActivity(videoPlayIntent);
+//        Intent videoPlayIntent = new Intent(this.getContext(), VideoPlayActivity.class);
+//        videoPlayIntent.setData(videoUri);
+//        startActivity(videoPlayIntent);
 
     }
 

@@ -17,6 +17,6 @@ public interface UploadService {
     Call<FileNameBody> postImage(@Part("text") String text, @Part("user_id") String id, @Part("group_name") String group_name, @Part MultipartBody.Part image);
 
     @Multipart
-    @POST("/api/nameBook")
+    @POST("/api/memoBook")
     Call<ResponseBody> addFileName(@Part("group_name") String group, @Part("file_name") String file);
 }

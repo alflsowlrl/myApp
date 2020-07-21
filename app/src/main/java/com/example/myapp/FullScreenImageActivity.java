@@ -3,6 +3,7 @@ package com.example.myapp;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -27,6 +28,7 @@ public class FullScreenImageActivity extends AppCompatActivity implements View.O
         Intent callingActivityIntent = getIntent();
         if(callingActivityIntent != null) {
             mImageUri = callingActivityIntent.getData();
+
             if(mImageUri != null && fullScreenImageView != null) {
                 Glide.with(this).load(mImageUri).into(fullScreenImageView);
             }

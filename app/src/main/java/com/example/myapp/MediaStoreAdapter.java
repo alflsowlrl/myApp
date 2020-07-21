@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,7 @@ public class MediaStoreAdapter extends RecyclerView.Adapter<MediaStoreAdapter.Vi
     private Cursor mMediaStoreCursor;
     private final Activity mActivity;
     private OnClickThumbListener mOnClickThumbListener;
-    ArrayList<String> file_name_list;
+    ArrayList<String> file_name_list = new ArrayList<String>();
     private final String server_url = "http://192.249.19.244:1880";
 
     public interface OnClickThumbListener {
@@ -40,13 +41,22 @@ public class MediaStoreAdapter extends RecyclerView.Adapter<MediaStoreAdapter.Vi
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.media_image_view, parent, false);
+
+
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+
+        String group_name = PreferenceManager.getString(mActivity.getApplicationContext(),"group_name");
+        Log.d("gallery", group_name);
+
+        String url = server_url + "/download/" + group_name + "+" + file_name_list.get(position);
+
+        Log.d("gallery", url);
         Glide.with(mActivity)
-                .load(server_url + "/download/" + file_name_list.get(position))
+                .load(url)
                 .centerCrop()
                 .override(96, 96)
                 .into(holder.getImageView());
@@ -55,7 +65,7 @@ public class MediaStoreAdapter extends RecyclerView.Adapter<MediaStoreAdapter.Vi
 
     @Override
     public int getItemCount() {
-        return (mMediaStoreCursor == null) ? 0 : mMediaStoreCursor.getCount();
+        return file_name_list.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
